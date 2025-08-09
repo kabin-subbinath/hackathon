@@ -1,5 +1,3 @@
-# PASTE THIS ENTIRE CODE BLOCK INTO YOUR app.py FILE
-
 import os
 from flask import Flask, render_template, request, redirect, url_for, jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
@@ -30,7 +28,7 @@ class User(db.Model, UserMixin):
     roll_no = db.Column(db.String(20), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
-    role = db.Column(db.String(20), nullable=False, default='student') # student, warden, security
+    role = db.Column(db.String(20), nullable=False, default='student')
     parent_contact = db.Column(db.String(15))
     student_mobile = db.Column(db.String(15))
     college_reg_no = db.Column(db.String(20))
@@ -189,7 +187,6 @@ def warden_dashboard():
     if current_user.role != 'warden': return redirect(url_for('login'))
     pending_leaves = LeaveRequest.query.filter_by(status='Pending').all()
     pending_passes = GatePass.query.filter_by(status='Pending').all()
-    # Warden sees all logs
     scan_logs = ScanLog.query.order_by(ScanLog.id.desc()).all()
     return render_template('warden_dashboard.html',
                            pending_leaves=pending_leaves,
@@ -234,12 +231,10 @@ def manage_gatepass(pass_id, action):
     db.session.commit()
     return redirect(url_for('warden_dashboard'))
 
-# --- Security Routes ---
 @app.route("/security/dashboard")
 @login_required
 def security_dashboard():
     if current_user.role != 'security': return redirect(url_for('login'))
-    # UPDATED: Security only sees students who are 'Out' or 'Returned'
     scan_logs = ScanLog.query.filter(ScanLog.status.in_(['Out', 'Returned'])).order_by(ScanLog.id.desc()).all()
     return render_template('security_dashboard.html', scan_logs=scan_logs)
 
@@ -293,9 +288,19 @@ def setup_database(app):
             db.session.add(User(roll_no='STU001', name='John Doe', role='student', password='password123'))
         db.session.commit()
 
-if __name__ == '__main__':
+
+# --- THIS IS THE FIX ---
+# Call setup_database() when the app starts, outside the main block.
+# This ensures tables are created when deployed on a server like Render.
+with app.app_context():
     setup_database(app)
-    # The 'ssl_context' enables HTTPS for the camera.
-    # To switch back to HTTP (no warning, but camera may fail), just delete the 'ssl_context' part.
-    # Example for HTTP: app.run(debug=True, host='0.0.0.0')
-    app.run(debug=False, ssl_context='adhoc', host='0.0.0.0')
+
+
+# The main block below is now only for running the app on your local computer.
+# The production server (Gunicorn) will ignore this.
+if __name__ == '__main__':
+    # For local development, you can still use the HTTPS context for your camera
+    # app.run(debug=True, ssl_context='adhoc', host='0.0.0.0')
+    
+    # Or run it simply with HTTP
+    app.run(debug=True, host='0.0.0.0')
