@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Warden Dashboard{% endblock %}
+{% block content %}
+    <div class="card full-width">
+        <h3>Live Gate Activity Log</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Register No</th>
+                        <th>Student Name</th>
+                        <th>Student Mobile</th>
+                        <th>Parent Mobile</th>
+                        <th>Out Time</th>
+                        <th>In Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in scan_logs %}
+                    <tr>
+                        <td>{{ log.student_reg_no }}</td>
+                        <td>{{ log.student_name }}</td>
+                        <td>{{ log.student_mobile }}</td>
+                        <td>{{ log.parent_mobile }}</td>
+                        <td>
+                            {% if log.out_time %}
+                                {{ log.out_time.strftime('%d %b, %I:%M %p') }}
+                            {% elif log.status == 'Approved' %}
+                                <span style="font-weight: bold; color: #777;">Not Yet Out</span>
+                            {% else %}
+                                --
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if log.in_time %}
+                                {{ log.in_time.strftime('%d %b, %I:%M %p') }}
+                            {% else %}
+                                --
+                            {% endif %}
+                        </td>
+                        <td><span class="status-{{ log.status.lower() }}">{{ log.status }}</span></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" style="text-align: center;">No activity recorded yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="grid-container">
+        <div class="card">
+            <h3>Pending Leave Requests</h3>
+            {% if not pending_leaves %}
+                <p>No pending leave requests.</p>
+            {% endif %}
+            {% for req in pending_leaves %}
+            <div class="request-item">
+                <p><strong>{{ req.student_name }} ({{ req.college_reg_no }})</strong></p>
+                <p><strong>Destination:</strong> {{ req.destination }}</p>
+                <p><strong>Reason:</strong> {{ req.reason }}</p>
+                <p><strong>Dates:</strong> {{ req.from_date.strftime('%d %b') }} to {{ req.to_date.strftime('%d %b') }}</p>
+                <p><strong>Parent Contact:</strong> {{ req.parent_contact }}</p>
+                <div class="actions">
+                    <form action="{{ url_for('manage_leave', request_id=req.id, action='approve') }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-success btn-small">Approve</button>
+                    </form>
+                    <form action="{{ url_for('manage_leave', request_id=req.id, action='reject') }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-small">Reject</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="card">
+            <h3>Pending Gate Pass Requests</h3>
+            {% if not pending_passes %}
+                <p>No pending gate pass requests.</p>
+            {% endif %}
+            {% for gp in pending_passes %}
+            <div class="request-item">
+                <p><strong>{{ gp.student_name }} ({{ gp.college_reg_no }})</strong></p>
+                <p><strong>Out:</strong> {{ gp.out_time.strftime('%d %b, %I:%M %p') }}</p>
+                <p><strong>Return:</strong> {{ gp.expected_return_time.strftime('%d %b, %I:%M %p') }}</p>
+                 <p><strong>Parent Contact:</strong> {{ gp.parent_contact }}</p>
+                <div class="actions">
+                    <form action="{{ url_for('manage_gatepass', pass_id=gp.id, action='approve') }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-success btn-small">Approve</button>
+                    </form>
+                    <form action="{{ url_for('manage_gatepass', pass_id=gp.id, action='reject') }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-small">Reject</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %}Student Dashboard{% endblock %}
+{% block content %}
+    <div class="grid-container">
+        <div class="card">
+            <h3>Request Leave</h3>
+            <form action="{{ url_for('request_leave') }}" method="POST">
+                <div class="form-group">
+                    <label for="student_name">Student Name</label>
+                    <input type="text" id="student_name" name="student_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="college_reg_no">College Register Number</label>
+                    <input type="text" id="college_reg_no" name="college_reg_no" required>
+                </div>
+                 <div class="form-group">
+                    <label for="department">Department</label>
+                    <select id="department" name="department" required>
+                        <option value="" disabled selected>Select your department</option>
+                        <option value="AI&DS">AI&DS</option>
+                        <option value="AIML">AIML</option>
+                        <option value="CSE">CSE</option>
+                        <option value="CSBS">CSBS</option>
+                        <option value="MECH">MECH</option>
+                        <option value="ECE">ECE</option>
+                        <option value="VLSI">VLSI</option>
+                        <option value="BIO TECH">BIO TECH</option>
+                        <option value="RSB">RSB</option>
+                    </select>
+                </div>
+                 <div class="form-group">
+                    <label for="year">Year</label>
+                     <select id="year" name="year" required>
+                        <option value="" disabled selected>Select your year</option>
+                        <option value="1st">1st</option>
+                        <option value="2nd">2nd</option>
+                        <option value="3rd">3rd</option>
+                        <option value="4th">4th</option>
+                    </select>
+                </div>
+                 <div class="form-group">
+                    <label for="student_mobile">Student Mobile</label>
+                    <input type="tel" id="student_mobile" name="student_mobile" required>
+                </div>
+                <div class="form-group">
+                    <label for="parent_contact">Parent Contact</label>
+                    <input type="tel" id="parent_contact" name="parent_contact" required>
+                </div>
+                <div class="form-group">
+                    <label>Destination</label>
+                    <input type="text" name="destination" required>
+                </div>
+                <div class="form-group">
+                    <label>Reason</label>
+                    <textarea name="reason" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>From Date</label>
+                    <input type="datetime-local" name="from_date" required>
+                </div>
+                <div class="form-group">
+                    <label>To Date</label>
+                    <input type="datetime-local" name="to_date" required>
+                </div>
+                <button type="submit" class="btn">Submit Leave Request</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Request Weekend Gate Pass</h3>
+            <form action="{{ url_for('request_gatepass') }}" method="POST">
+                 <div class="form-group">
+                    <label for="gp_student_name">Student Name</label>
+                    <input type="text" id="gp_student_name" name="student_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="gp_college_reg_no">College Register Number</label>
+                    <input type="text" id="gp_college_reg_no" name="college_reg_no" required>
+                </div>
+                 <div class="form-group">
+                    <label for="gp_department">Department</label>
+                    <select id="gp_department" name="department" required>
+                        <option value="" disabled selected>Select your department</option>
+                        <option value="AI&DS">AI&DS</option>
+                        <option value="AIML">AIML</option>
+                        <option value="CSE">CSE</option>
+                        <option value="CSBS">CSBS</option>
+                        <option value="MECH">MECH</option>
+                        <option value="ECE">ECE</option>
+                        <option value="VLSI">VLSI</option>
+                        <option value="BIO TECH">BIO TECH</option>
+                        <option value="RSB">RSB</option>
+                    </select>
+                </div>
+                 <div class="form-group">
+                    <label for="gp_year">Year</label>
+                    <select id="gp_year" name="year" required>
+                        <option value="" disabled selected>Select your year</option>
+                        <option value="1st">1st</option>
+                        <option value="2nd">2nd</option>
+                        <option value="3rd">3rd</option>
+                        <option value="4th">4th</option>
+                    </select>
+                </div>
+                 <div class="form-group">
+                    <label for="gp_student_mobile">Student Mobile</label>
+                    <input type="tel" id="gp_student_mobile" name="student_mobile" required>
+                </div>
+                <div class="form-group">
+                    <label for="gp_parent_contact">Parent Contact</label>
+                    <input type="tel" id="gp_parent_contact" name="parent_contact" required>
+                </div>
+                <div class="form-group">
+                    <label>Out Time</label>
+                    <input type="datetime-local" name="out_time" required>
+                </div>
+                <div class="form-group">
+                    <label>Expected Return Time</label>
+                    <input type="datetime-local" name="return_time" required>
+                </div>
+                <button type="submit" class="btn">Submit Gate Pass Request</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card full-width">
+        <h3>My Requests Status</h3>
+        <h4>Leave Requests</h4>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Destination</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Status</th>
+                        <th>QR Code</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in leave_requests %}
+                    <tr>
+                        <td>{{ req.destination }}</td>
+                        <td>{{ req.from_date.strftime('%d %b %Y, %I:%M %p') }}</td>
+                        <td>{{ req.to_date.strftime('%d %b %Y, %I:%M %p') }}</td>
+                        <td><span class="status-{{ req.status.lower() }}">{{ req.status }}</span></td>
+                        <td>
+                            {% if req.status == 'Approved' and req.qr_code %}
+                                <img src="{{ req.qr_code }}" alt="QR Code" width="100">
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <h4>Gate Passes</h4>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Out Time</th>
+                        <th>Return Time</th>
+                        <th>Status</th>
+                        <th>QR Code</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for gp in gate_passes %}
+                    <tr>
+                        <td>{{ gp.out_time.strftime('%d %b %Y, %I:%M %p') }}</td>
+                        <td>{{ gp.expected_return_time.strftime('%d %b %Y, %I:%M %p') }}</td>
+                        <td><span class="status-{{ gp.status.lower() }}">{{ gp.status }}</span></td>
+                        <td>
+                            {% if gp.status == 'Approved' and gp.qr_code %}
+                                <img src="{{ gp.qr_code }}" alt="QR Code" width="100">
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

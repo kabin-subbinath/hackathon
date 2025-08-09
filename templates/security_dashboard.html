@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Security Dashboard{% endblock %}
+
+{% block content %}
+<div class="grid-container">
+    <div class="card">
+        <h3>QR Code Scanner</h3>
+        <button id="scan-button" class="btn btn-success" style="width:100%; height: 60px; font-size: 1.2rem;">Start Camera Scan</button>
+        <div id="qr-reader" style="width:100%; display:none; margin-top:1rem;"></div>
+        <div id="qr-reader-results" style="margin-top: 1rem; color: #dc3545; font-weight: bold;"></div>
+    </div>
+    <div class="card">
+        <h3>Last Scan Result</h3>
+        <div id="scan-result">
+            <p>Click the scan button to get started.</p>
+        </div>
+    </div>
+</div>
+
+<div class="card full-width">
+    <h3>Live Gate Activity Log (Students Out & Returned)</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Register No</th>
+                    <th>Student Name</th>
+                    <th>Out Time</th>
+                    <th>In Time</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in scan_logs %}
+                <tr>
+                    <td>{{ log.student_reg_no }}</td>
+                    <td>{{ log.student_name }}</td>
+                    <td>
+                        {% if log.out_time %} {{ log.out_time.strftime('%d %b, %I:%M %p') }} {% else %} -- {% endif %}
+                    </td>
+                    <td>
+                        {% if log.in_time %} {{ log.in_time.strftime('%d %b, %I:%M %p') }} {% else %} -- {% endif %}
+                    </td>
+                    <td><span class="status-{{ log.status.lower() }}">{{ log.status }}</span></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center;">No students are currently out.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script defer src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const scanButton = document.getElementById('scan-button');
+    const qrReaderDiv = document.getElementById('qr-reader');
+    const resultDiv = document.getElementById('scan-result');
+    
+    // This function runs after a successful scan
+    function onScanSuccess(decodedText, decodedResult) {
+        html5QrcodeScanner.clear().catch(error => {
+            console.error("Failed to clear scanner:", error);
+        });
+        qrReaderDiv.style.display = 'none';
+        scanButton.style.display = 'block';
+
+        resultDiv.innerHTML = `<p>Processing scan...</p>`;
+
+        fetch('/api/scan_qr', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 'qr_content': decodedText })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                resultDiv.innerHTML = `<h4 class="danger-text">Scan Error!</h4><p><strong>Reason:</strong> ${data.error}</p>`;
+            } else {
+                resultDiv.innerHTML = `<h4>${data.status_message}</h4><p><strong>Name:</strong> ${data.student_name}</p><p><strong>Reg No:</strong> ${data.reg_no}</p>`;
+                setTimeout(() => location.reload(), 2000);
+            }
+        });
+    }
+
+    let html5QrcodeScanner;
+
+    // Add an event listener to our button
+    scanButton.addEventListener('click', () => {
+        scanButton.style.display = 'none';
+        qrReaderDiv.style.display = 'block';
+        resultDiv.innerHTML = '<p>Point camera at a QR code.</p>';
+        
+        // Create the scanner instance ONLY when the button is clicked
+        html5QrcodeScanner = new Html5QrcodeScanner(
+            "qr-reader", 
+            { fps: 10, qrbox: {width: 250, height: 250} }, 
+            false
+        );
+        
+        html5QrcodeScanner.render(onScanSuccess);
+    });
+});
+</script>
+{% endblock %}

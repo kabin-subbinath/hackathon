@@ -1,0 +1,222 @@
+/* General Body & Typography */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    margin: 0;
+    line-height: 1.6;
+}
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+h2, h3, h4 {
+    color: #0056b3;
+}
+
+/* Navigation Bar */
+nav {
+    background-color: #0056b3;
+    color: white;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px; /* Added padding for spacing on smaller screens */
+}
+.nav-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    margin-left: 1rem;
+}
+.nav-user {
+    margin-right: 1rem;
+    font-weight: 500;
+}
+
+/* Forms & Buttons */
+.form-container {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.form-group {
+    margin-bottom: 1rem;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
+}
+.btn {
+    display: inline-block;
+    background-color: #007bff;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    font-size: 1rem;
+    width: 100%; /* Make buttons full-width by default for mobile */
+    box-sizing: border-box;
+}
+/* On larger screens, buttons can be auto-width */
+@media (min-width: 768px) {
+    .btn {
+        width: auto;
+    }
+}
+.btn:hover {
+    background-color: #0056b3;
+}
+.btn-success { background-color: #28a745; }
+.btn-danger { background-color: #dc3545; }
+.btn-small { padding: 0.25rem 0.5rem; font-size: 0.8rem; }
+
+/* Cards and Layout */
+.grid-container {
+    display: grid;
+    /* Updated for better responsiveness */
+    grid-template-columns: 1fr; /* Default to single column */
+    gap: 20px;
+    margin-bottom: 20px;
+}
+/* Two-column layout on larger screens */
+@media (min-width: 992px) {
+    .grid-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+.card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.full-width {
+    grid-column: 1 / -1;
+}
+
+/* Tables */
+.table-container {
+    overflow-x: auto; /* This makes the table scrollable on small screens */
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+th, td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    white-space: nowrap; /* Prevents text from wrapping */
+}
+th {
+    background-color: #f2f2f2;
+}
+
+/* Status & Alerts */
+.alert {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+.alert-success { background-color: #d4edda; color: #155724; }
+.alert-danger { background-color: #f8d7da; color: #721c24; }
+.alert-info { background-color: #cce5ff; color: #004085; }
+
+.status-pending { color: #ffc107; font-weight: bold; }
+.status-approved { color: #28a745; font-weight: bold; }
+.status-rejected { color: #dc3545; font-weight: bold; }
+.status-valid { color: #28a745; font-weight: bold; }
+.status-expired { color: #ffc107; font-weight: bold; }
+.status-already-returned { color: #6c757d; font-weight: bold; }
+.status-out { color: #ffc107; font-weight: bold; }
+.status-returned { color: #28a745; font-weight: bold; }
+
+.danger-text { color: #dc3545; }
+.danger-row { background-color: #f8d7da !important; }
+
+/* Request Items (Warden View) */
+.request-item {
+    border: 1px solid #eee;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+}
+.request-item p { margin: 0.5rem 0; }
+.request-item .actions { 
+    margin-top: 1rem;
+    display: flex; /* Use flexbox for button alignment */
+    gap: 10px; /* Add space between buttons */
+}
+.request-item .actions form {
+    display: inline;
+}
+
+
+/* --- RESPONSIVENESS --- */
+
+/* For Security QR Scanner */
+#qr-reader {
+    width: 100% !important; /* Override inline style for responsiveness */
+    max-width: 500px; /* Optional: set a max-width for very large screens */
+    margin: 0 auto; /* Center the scanner */
+}
+
+/* Mobile Devices (up to 767px) */
+@media (max-width: 767px) {
+    .nav-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .nav-links {
+        margin-top: 1rem;
+        width: 100%;
+    }
+    .nav-links a {
+        display: block;
+        margin-left: 0;
+        padding: 0.5rem 0;
+    }
+    .nav-user {
+        margin-bottom: 0.5rem;
+    }
+    .form-container {
+        padding: 1.5rem;
+        margin: 20px 10px;
+    }
+    .card {
+        padding: 1rem;
+    }
+    .container {
+        padding: 0 10px;
+    }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.25rem; }
+}
